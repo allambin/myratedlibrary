@@ -25,7 +25,7 @@
             android:layout_weight="2"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="@string/title" />
+            android:hint="@string/title" />
 
     </LinearLayout>
 
@@ -48,7 +48,7 @@
             android:layout_weight="2"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="@string/author" />
+            android:hint="@string/author" />
     </LinearLayout>
 
     <LinearLayout

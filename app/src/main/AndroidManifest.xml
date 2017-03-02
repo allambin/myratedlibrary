@@ -16,6 +16,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".BookEditorActivity"></activity>
+
+        <provider
+            android:name=".data.BookProvider"
+            android:authorities="com.inextends.myratedlibrary"
+            android:exported="false" />
     </application>
 
 </manifest>
