@@ -10,19 +10,19 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.inextends.myratedlibrary.BookDbHelper;
-
 public class BookProvider extends ContentProvider {
 
     private static final String TAG = "BookProvider";
 
     private BookDbHelper mDbHelper;
     private static final int BOOKS = 100;
+    private static final int BOOKS_ID = 101;
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
         sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS, BOOKS);
+        sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS + "/#", BOOKS_ID);
     }
 
     @Override
@@ -41,6 +41,11 @@ public class BookProvider extends ContentProvider {
         int match = sUriMatcher.match(uri);
         switch (match) {
             case BOOKS:
+                cursor = database.query(BookContract.BookEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case BOOKS_ID:
+                selection = BookContract.BookEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 cursor = database.query(BookContract.BookEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             default:
@@ -101,7 +106,34 @@ public class BookProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
-        return 0;
+    public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
+        Log.i(TAG, "update: " + uri);
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case BOOKS_ID:
+                selection = BookContract.BookEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return updatePet(uri, contentValues, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Update is not supported for " + uri);
+        }
+    }
+
+    private int updatePet(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        if (values.containsKey(BookContract.BookEntry.COLUMN_TITLE)) {
+            String title = values.getAsString(BookContract.BookEntry.COLUMN_TITLE);
+            if (title == null) {
+                throw new IllegalArgumentException("Book requires a title");
+            }
+        }
+
+        int numRowsAffected = database.update(BookContract.BookEntry.TABLE_NAME, values, selection, selectionArgs);
+        if (numRowsAffected != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return numRowsAffected;
     }
 }

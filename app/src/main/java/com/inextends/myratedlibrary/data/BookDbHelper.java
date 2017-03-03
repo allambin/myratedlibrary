@@ -1,4 +1,4 @@
-package com.inextends.myratedlibrary;
+package com.inextends.myratedlibrary.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

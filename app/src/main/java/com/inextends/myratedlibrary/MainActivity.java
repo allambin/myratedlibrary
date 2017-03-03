@@ -1,14 +1,17 @@
 package com.inextends.myratedlibrary;
 
+import android.content.ContentUris;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.inextends.myratedlibrary.data.BookContract;
@@ -34,6 +37,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mBookCursorAdapter = new BookCursorAdapter(this, null);
         booksListView.setAdapter(mBookCursorAdapter);
+        booksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Intent intent = new Intent(MainActivity.this, BookEditorActivity.class);
+                Uri currentBookUri = ContentUris.withAppendedId(BookContract.BookEntry.CONTENT_URI, id);
+                intent.setData(currentBookUri);
+                startActivity(intent);
+            }
+        });
 
         getLoaderManager().initLoader(LOADER_ID, null, this);
 

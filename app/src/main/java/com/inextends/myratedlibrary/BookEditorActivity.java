@@ -1,55 +1,109 @@
 package com.inextends.myratedlibrary;
 
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.CursorLoader;
+import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.net.Uri;
+import android.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.inextends.myratedlibrary.data.BookContract;
+import com.inextends.myratedlibrary.data.BookDbHelper;
 
-public class BookEditorActivity extends AppCompatActivity {
+public class BookEditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private Button mSaveBook;
-    private EditText mBookTitle;
+    private Button mSaveBookButton;
+    private EditText mBookTitleEditText;
     private BookDbHelper mDbHelper;
+    private Uri mCurrentBookUri;
+    private static final int EXISTING_BOOK_LOADER_ID = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_editor);
 
-        mSaveBook = (Button) findViewById(R.id.button_save);
-        mBookTitle = (EditText) findViewById(R.id.edit_title);
+        Intent intent = getIntent();
+        mCurrentBookUri = intent.getData();
+        if (mCurrentBookUri != null) {
+            getLoaderManager().initLoader(EXISTING_BOOK_LOADER_ID, null, this);
+        }
+
+        mSaveBookButton = (Button) findViewById(R.id.button_save);
+        mBookTitleEditText = (EditText) findViewById(R.id.edit_title);
 
         mDbHelper = new BookDbHelper(this);
 
-        mSaveBook.setOnClickListener(new View.OnClickListener() {
+        mSaveBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                insertBook();
+                saveBook();
             }
         });
     }
 
-    private void insertBook() {
-        String title = mBookTitle.getText().toString().trim();
+    private void saveBook() {
+        String title = mBookTitleEditText.getText().toString().trim();
+
+        if (mCurrentBookUri == null && TextUtils.isEmpty(title)) {
+            return;
+        }
 
         ContentValues values = new ContentValues();
         values.put(BookContract.BookEntry.COLUMN_TITLE, title);
 
-        Uri result = getContentResolver().insert(BookContract.BookEntry.CONTENT_URI, values);
-        if (result == null) {
-            Toast.makeText(this, getString(R.string.insert_book_failure),
-                    Toast.LENGTH_SHORT).show();
+        if (mCurrentBookUri == null) {
+            Uri result = getContentResolver().insert(BookContract.BookEntry.CONTENT_URI, values);
+            if (result == null) {
+                Toast.makeText(this, getString(R.string.insert_book_failure),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.insert_book_success),
+                        Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Toast.makeText(this, getString(R.string.insert_book_success),
-                    Toast.LENGTH_SHORT).show();
+            int rowsAffected = getContentResolver().update(mCurrentBookUri, values, null, null);
+            if (rowsAffected == 0) {
+                Toast.makeText(this, getString(R.string.update_book_failure),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.update_book_success),
+                        Toast.LENGTH_SHORT).show();
+            }
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        String[] projection = {
+                BookContract.BookEntry._ID,
+                BookContract.BookEntry.COLUMN_TITLE
+        };
+        return new CursorLoader(this, mCurrentBookUri, projection, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor == null || cursor.getCount() < 1) {
+            return;
+        }
+
+        if (cursor.moveToFirst()) {
+            String title = cursor.getString(cursor.getColumnIndex(BookContract.BookEntry.COLUMN_TITLE));
+            mBookTitleEditText.setText(title);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mBookTitleEditText.setText("");
     }
 }
