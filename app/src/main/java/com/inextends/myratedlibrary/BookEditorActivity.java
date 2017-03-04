@@ -10,6 +10,9 @@ import android.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,6 +53,25 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (mCurrentBookUri != null) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.menu_book_editor, menu);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_delete:
+                return deleteBook();
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void saveBook() {
         String title = mBookTitleEditText.getText().toString().trim();
 
@@ -79,6 +101,22 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
                         Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private boolean deleteBook() {
+        int rowDeleted = 0;
+        if (mCurrentBookUri != null) {
+            rowDeleted = getContentResolver().delete(mCurrentBookUri, null, null);
+            if (rowDeleted > 0) {
+                Toast.makeText(this, getString(R.string.delete_book_success),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.delete_book_failure),
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        return rowDeleted > 0;
     }
 
     @Override

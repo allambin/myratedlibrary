@@ -3,8 +3,11 @@
     <string name="title">Title</string>
     <string name="author">Author</string>
     <string name="save">Save</string>
+    <string name="delete">Delete</string>
     <string name="insert_book_failure">Could not insert book</string>
     <string name="insert_book_success">The book has been saved</string>
     <string name="update_book_failure">Could not update book</string>
     <string name="update_book_success">The book has been updated</string>
+    <string name="delete_book_failure">Could not delete book</string>
+    <string name="delete_book_success">The book has been deleted</string>
 </resources>

@@ -101,8 +101,26 @@ public class BookProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String s, String[] strings) {
-        return 0;
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case BOOKS_ID:
+                selection = BookContract.BookEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return deleteBook(uri, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Deletion is not supported for " + uri);
+        }
+    }
+
+    private int deleteBook(Uri uri, String selection, String[] selectionArgs) {
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+        int numRowsAffected = database.delete(BookContract.BookEntry.TABLE_NAME, selection, selectionArgs);
+        if (numRowsAffected != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return numRowsAffected;
     }
 
     @Override
