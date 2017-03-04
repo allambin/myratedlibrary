@@ -125,19 +125,18 @@ public class BookProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
-        Log.i(TAG, "update: " + uri);
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case BOOKS_ID:
                 selection = BookContract.BookEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                return updatePet(uri, contentValues, selection, selectionArgs);
+                return updateBook(uri, contentValues, selection, selectionArgs);
             default:
                 throw new IllegalArgumentException("Update is not supported for " + uri);
         }
     }
 
-    private int updatePet(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    private int updateBook(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         if (values.containsKey(BookContract.BookEntry.COLUMN_TITLE)) {
