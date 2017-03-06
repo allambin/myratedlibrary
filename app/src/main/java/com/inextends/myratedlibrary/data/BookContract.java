@@ -18,6 +18,7 @@ public class BookContract {
 
         public static final String TABLE_NAME = "books";
         public static final String COLUMN_TITLE = "title";
+        public static final String COLUMN_COMMENT = "comment";
 
         public static final String CONTENT_LIST_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_BOOKS;

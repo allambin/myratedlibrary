@@ -25,6 +25,7 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
 
     private Button mSaveBookButton;
     private EditText mBookTitleEditText;
+    private EditText mBookCommentEditText;
     private BookDbHelper mDbHelper;
     private Uri mCurrentBookUri;
     private static final int EXISTING_BOOK_LOADER_ID = 2;
@@ -42,6 +43,7 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
 
         mSaveBookButton = (Button) findViewById(R.id.button_save);
         mBookTitleEditText = (EditText) findViewById(R.id.edit_title);
+        mBookCommentEditText = (EditText) findViewById(R.id.edit_comment);
 
         mDbHelper = new BookDbHelper(this);
 
@@ -74,13 +76,14 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
 
     private void saveBook() {
         String title = mBookTitleEditText.getText().toString().trim();
-
         if (mCurrentBookUri == null && TextUtils.isEmpty(title)) {
             return;
         }
+        String comment = mBookCommentEditText.getText().toString().trim();
 
         ContentValues values = new ContentValues();
         values.put(BookContract.BookEntry.COLUMN_TITLE, title);
+        values.put(BookContract.BookEntry.COLUMN_COMMENT, comment);
 
         if (mCurrentBookUri == null) {
             Uri result = getContentResolver().insert(BookContract.BookEntry.CONTENT_URI, values);
@@ -123,7 +126,8 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         String[] projection = {
                 BookContract.BookEntry._ID,
-                BookContract.BookEntry.COLUMN_TITLE
+                BookContract.BookEntry.COLUMN_TITLE,
+                BookContract.BookEntry.COLUMN_COMMENT
         };
         return new CursorLoader(this, mCurrentBookUri, projection, null, null, null);
     }
@@ -135,13 +139,16 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         }
 
         if (cursor.moveToFirst()) {
-            String title = cursor.getString(cursor.getColumnIndex(BookContract.BookEntry.COLUMN_TITLE));
+            String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
+            String comment = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_COMMENT));
             mBookTitleEditText.setText(title);
+            mBookCommentEditText.setText(comment);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mBookTitleEditText.setText("");
+        mBookCommentEditText.setText("");
     }
 }

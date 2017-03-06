@@ -2,6 +2,7 @@
     <string name="app_name">My Rated Library</string>
     <string name="title">Title</string>
     <string name="author">Author</string>
+    <string name="comment">Comment</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="insert_book_failure">Could not insert book</string>
