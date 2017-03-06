@@ -1,24 +1,22 @@
 package com.inextends.myratedlibrary;
 
+import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.design.widget.FloatingActionButton;
-import android.app.LoaderManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.inextends.myratedlibrary.data.BookContract;
 
-import java.util.ArrayList;
-
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class BookList extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private BookCursorAdapter mBookCursorAdapter;
     private static final int LOADER_ID = 1;
@@ -28,11 +26,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.books_list);
 
-        final ArrayList<Book> books = new ArrayList<>();
-        books.add(new Book("Death on the Nile", "Agatha Christie", 5));
-        books.add(new Book("Dome", "Stephen King", 5));
-        books.add(new Book("Doctor Sleep", "Stephen King", 3));
-
         ListView booksListView = (ListView) findViewById(R.id.list_books);
 
         mBookCursorAdapter = new BookCursorAdapter(this, null);
@@ -40,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         booksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Intent intent = new Intent(MainActivity.this, BookEditorActivity.class);
+                Intent intent = new Intent(BookList.this, BookDetails.class);
                 Uri currentBookUri = ContentUris.withAppendedId(BookContract.BookEntry.CONTENT_URI, id);
                 intent.setData(currentBookUri);
                 startActivity(intent);
@@ -53,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, BookEditorActivity.class);
+                Intent intent = new Intent(BookList.this, BookEditorActivity.class);
                 startActivity(intent);
             }
         });

@@ -1,14 +1,14 @@
 package com.inextends.myratedlibrary;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.app.LoaderManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -93,6 +93,10 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
             } else {
                 Toast.makeText(this, getString(R.string.insert_book_success),
                         Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(BookEditorActivity.this, BookDetails.class);
+                intent.setData(result);
+                startActivity(intent);
             }
         } else {
             int rowsAffected = getContentResolver().update(mCurrentBookUri, values, null, null);
@@ -103,6 +107,10 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
                 Toast.makeText(this, getString(R.string.update_book_success),
                         Toast.LENGTH_SHORT).show();
             }
+
+            Intent intent = new Intent(BookEditorActivity.this, BookDetails.class);
+            intent.setData(mCurrentBookUri);
+            startActivity(intent);
         }
     }
 
