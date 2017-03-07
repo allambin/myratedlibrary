@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.inextends.myratedlibrary.data.AuthorContract;
 import com.inextends.myratedlibrary.data.BookContract;
 
 public class BookList extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -56,7 +57,8 @@ public class BookList extends AppCompatActivity implements LoaderManager.LoaderC
     public Loader onCreateLoader(int i, Bundle bundle) {
         String[] projection = {
                 BookContract.BookEntry._ID,
-                BookContract.BookEntry.COLUMN_TITLE
+                BookContract.BookEntry.COLUMN_TITLE,
+                AuthorContract.AuthorEntry.COLUMN_NAME
         };
         return new CursorLoader(this, BookContract.BookEntry.CONTENT_URI, projection, null, null, null);
     }

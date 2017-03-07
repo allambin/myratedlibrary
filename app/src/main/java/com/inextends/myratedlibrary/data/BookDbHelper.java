@@ -6,15 +6,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.inextends.myratedlibrary.data.BookContract;
-
 public class BookDbHelper extends SQLiteOpenHelper {
 
     public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "ratedlibrary.db";
     private static final String TAG = "BookDbHelper";
 
-    private static final String SQL_CREATE_ENTRIES =
+    private static final String SQL_CREATE_BOOKS_TABLE =
             "CREATE TABLE " + BookContract.BookEntry.TABLE_NAME + " (" +
                     BookContract.BookEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     BookContract.BookEntry.COLUMN_TITLE + " TEXT NOT NULL)";
@@ -26,18 +24,36 @@ public class BookDbHelper extends SQLiteOpenHelper {
             "ALTER TABLE " + BookContract.BookEntry.TABLE_NAME + " ADD COLUMN " +
                     BookContract.BookEntry.COLUMN_COMMENT + " TEXT";
 
+    private static final String SQL_CREATE_AUTHORS_TABLE =
+            "CREATE TABLE " + AuthorContract.AuthorEntry.TABLE_NAME + " (" +
+                    AuthorContract.AuthorEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    AuthorContract.AuthorEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                    "CONSTRAINT unique_name UNIQUE(" + AuthorContract.AuthorEntry.COLUMN_NAME + "))";
+
+    private static final String SQL_CREATE_BOOKS_AUTHORS_TABLE =
+            "CREATE TABLE " + BookAuthorContract.BookAuthorEntry.TABLE_NAME + " (" +
+                    BookAuthorContract.BookAuthorEntry.COLUMN_BOOK_ID + " INTEGER NOT NULL, " +
+                    BookAuthorContract.BookAuthorEntry.COLUMN_AUTHOR_ID + " INTEGER NOT NULL, " +
+                    "FOREIGN KEY(" + BookAuthorContract.BookAuthorEntry.COLUMN_BOOK_ID + ") " +
+                    "REFERENCES " + BookContract.BookEntry.TABLE_NAME + "(" + BookContract.BookEntry._ID + "), " +
+                    "FOREIGN KEY(" + BookAuthorContract.BookAuthorEntry.COLUMN_AUTHOR_ID + ") " +
+                    "REFERENCES " + AuthorContract.AuthorEntry.TABLE_NAME + "(" + AuthorContract.AuthorEntry._ID + ")" +
+                    "CONSTRAINT unique_fks UNIQUE(" + BookAuthorContract.BookAuthorEntry.COLUMN_BOOK_ID + ", " + BookAuthorContract.BookAuthorEntry.COLUMN_AUTHOR_ID + "))";
+
     public BookDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL(SQL_CREATE_ENTRIES);
+        sqLiteDatabase.execSQL(SQL_CREATE_BOOKS_TABLE);
         try {
             sqLiteDatabase.execSQL(SQL_ADD_COMMENT_COLUMN);
         } catch (SQLException e) {
             Log.d(TAG, "onCreate: could not add comment column, is probably already there");
         }
+        sqLiteDatabase.execSQL(SQL_CREATE_AUTHORS_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_BOOKS_AUTHORS_TABLE);
     }
 
     @Override

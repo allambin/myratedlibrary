@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.inextends.myratedlibrary.data.AuthorContract;
 import com.inextends.myratedlibrary.data.BookContract;
 
 public class BookDetails extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -20,6 +21,7 @@ public class BookDetails extends AppCompatActivity implements LoaderManager.Load
     private static final int EXISTING_BOOK_LOADER_ID = 2;
     private TextView mBookTitleTextView;
     private TextView mBookCommentTextView;
+    private TextView mAuthorNameTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,7 @@ public class BookDetails extends AppCompatActivity implements LoaderManager.Load
 
         mBookTitleTextView = (TextView) findViewById(R.id.toolbar_title);
         mBookCommentTextView = (TextView) findViewById(R.id.text_comment);
+        mAuthorNameTextView = (TextView) findViewById(R.id.text_author);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -65,8 +68,10 @@ public class BookDetails extends AppCompatActivity implements LoaderManager.Load
         if (cursor.moveToFirst()) {
             String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
             String comment = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_COMMENT));
+            String authorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
             mBookTitleTextView.setText(title);
             mBookCommentTextView.setText(comment);
+            mAuthorNameTextView.setText(authorName);
         }
     }
 

@@ -42,13 +42,13 @@
             android:text="@string/author" />
 
         <EditText
-            android:id="@+id/edit_book"
+            android:id="@+id/edit_author"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:ems="10"
-            android:inputType="textPersonName"
-            android:hint="@string/author" />
+            android:hint="@string/author"
+            android:inputType="textPersonName" />
     </LinearLayout>
 
     <LinearLayout

@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.inextends.myratedlibrary.data.AuthorContract;
 import com.inextends.myratedlibrary.data.BookContract;
 import com.inextends.myratedlibrary.data.BookDbHelper;
 
@@ -26,6 +27,7 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
     private Button mSaveBookButton;
     private EditText mBookTitleEditText;
     private EditText mBookCommentEditText;
+    private EditText mBookAuthorNameEditText;
     private BookDbHelper mDbHelper;
     private Uri mCurrentBookUri;
     private static final int EXISTING_BOOK_LOADER_ID = 2;
@@ -44,6 +46,7 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         mSaveBookButton = (Button) findViewById(R.id.button_save);
         mBookTitleEditText = (EditText) findViewById(R.id.edit_title);
         mBookCommentEditText = (EditText) findViewById(R.id.edit_comment);
+        mBookAuthorNameEditText = (EditText) findViewById(R.id.edit_author);
 
         mDbHelper = new BookDbHelper(this);
 
@@ -80,10 +83,12 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
             return;
         }
         String comment = mBookCommentEditText.getText().toString().trim();
+        String authorName = mBookAuthorNameEditText.getText().toString().trim();
 
         ContentValues values = new ContentValues();
         values.put(BookContract.BookEntry.COLUMN_TITLE, title);
         values.put(BookContract.BookEntry.COLUMN_COMMENT, comment);
+        values.put(AuthorContract.AuthorEntry.COLUMN_NAME, authorName);
 
         if (mCurrentBookUri == null) {
             Uri result = getContentResolver().insert(BookContract.BookEntry.CONTENT_URI, values);
@@ -149,8 +154,10 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         if (cursor.moveToFirst()) {
             String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
             String comment = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_COMMENT));
+            String authorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
             mBookTitleEditText.setText(title);
             mBookCommentEditText.setText(comment);
+            mBookAuthorNameEditText.setText(authorName);
         }
     }
 
@@ -158,5 +165,6 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
     public void onLoaderReset(Loader<Cursor> loader) {
         mBookTitleEditText.setText("");
         mBookCommentEditText.setText("");
+        mBookAuthorNameEditText.setText("");
     }
 }
