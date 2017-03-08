@@ -15,6 +15,8 @@ import android.widget.TextView;
 import com.inextends.myratedlibrary.data.AuthorContract;
 import com.inextends.myratedlibrary.data.BookContract;
 
+import java.util.ArrayList;
+
 public class BookDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private Uri mCurrentBookUri;
@@ -65,14 +67,18 @@ public class BookDetailsActivity extends AppCompatActivity implements LoaderMana
             return;
         }
 
+        ArrayList<String> authorsNames = new ArrayList<>();
+
         if (cursor.moveToFirst()) {
             String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
             String comment = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_COMMENT));
             String authorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
             mBookTitleTextView.setText(title);
             mBookCommentTextView.setText(comment);
-            mAuthorNameTextView.setText(authorName);
+            authorsNames.add(authorName);
         }
+
+        mAuthorNameTextView.setText(ArrayUtils.implode(", ", BookCursorUtils.getNextAuthorsNames(cursor, authorsNames)));
     }
 
     @Override

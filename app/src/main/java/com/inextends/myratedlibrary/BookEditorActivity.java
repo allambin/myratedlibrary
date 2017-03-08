@@ -72,18 +72,7 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         buttonAuthor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LinearLayout layout = new LinearLayout(BookEditorActivity.this);
-                layout.setOrientation(LinearLayout.HORIZONTAL);
-                layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-
-                EditText authorEditText = new EditText(BookEditorActivity.this);
-                authorEditText.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                authorEditText.setHint(R.string.author);
-                layout.addView(authorEditText);
-
-                mAuthorNameEditTexts.add(authorEditText);
-
-                mContainerAuthor.addView(layout);
+                createAuthorNameEditText();
             }
         });
     }
@@ -188,13 +177,29 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
             return;
         }
 
+        ArrayList<String> authorsNames = new ArrayList<>();
+
         if (cursor.moveToFirst()) {
             String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
             String comment = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_COMMENT));
             String authorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
             mBookTitleEditText.setText(title);
             mBookCommentEditText.setText(comment);
-            mBookAuthorNameEditText.setText(authorName);
+            authorsNames.add(authorName);
+        }
+
+        String[] authorsNamesArray = BookCursorUtils.getNextAuthorsNames(cursor, authorsNames);
+
+        // If we have more authors names than available Edit Texts, we create some.
+        if (mAuthorNameEditTexts.size() < authorsNamesArray.length) {
+            for (int i = mAuthorNameEditTexts.size(); i < authorsNamesArray.length; i++) {
+                createAuthorNameEditText();
+            }
+        }
+
+        // Then we fill them.
+        for (int i = 0; i < authorsNamesArray.length; i++) {
+            mAuthorNameEditTexts.get(i).setText(authorsNamesArray[i]);
         }
     }
 
@@ -203,5 +208,25 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         mBookTitleEditText.setText("");
         mBookCommentEditText.setText("");
         mBookAuthorNameEditText.setText("");
+    }
+
+    private void createAuthorNameEditText() {
+        createAuthorNameEditText("");
+    }
+
+    private void createAuthorNameEditText(String value) {
+        LinearLayout layout = new LinearLayout(BookEditorActivity.this);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
+        EditText authorEditText = new EditText(BookEditorActivity.this);
+        authorEditText.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        authorEditText.setHint(R.string.author);
+        authorEditText.setText(value);
+        layout.addView(authorEditText);
+
+        mAuthorNameEditTexts.add(authorEditText);
+
+        mContainerAuthor.addView(layout);
     }
 }
