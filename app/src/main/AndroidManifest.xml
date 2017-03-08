@@ -22,7 +22,7 @@
             android:authorities="com.inextends.myratedlibrary"
             android:exported="false" />
 
-        <activity android:name=".BookDetails"></activity>
+        <activity android:name=".BookDetailsActivity"></activity>
     </application>
 
 </manifest>

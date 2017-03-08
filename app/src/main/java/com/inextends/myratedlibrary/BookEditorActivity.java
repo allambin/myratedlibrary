@@ -99,7 +99,7 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
                 Toast.makeText(this, getString(R.string.insert_book_success),
                         Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(BookEditorActivity.this, BookDetails.class);
+                Intent intent = new Intent(BookEditorActivity.this, BookDetailsActivity.class);
                 intent.setData(result);
                 startActivity(intent);
             }
@@ -113,7 +113,7 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
                         Toast.LENGTH_SHORT).show();
             }
 
-            Intent intent = new Intent(BookEditorActivity.this, BookDetails.class);
+            Intent intent = new Intent(BookEditorActivity.this, BookDetailsActivity.class);
             intent.setData(mCurrentBookUri);
             startActivity(intent);
         }

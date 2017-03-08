@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.inextends.myratedlibrary.data.AuthorContract;
 import com.inextends.myratedlibrary.data.BookContract;
 
-public class BookDetails extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class BookDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private Uri mCurrentBookUri;
     private static final int EXISTING_BOOK_LOADER_ID = 2;
@@ -42,7 +42,7 @@ public class BookDetails extends AppCompatActivity implements LoaderManager.Load
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(BookDetails.this, BookEditorActivity.class);
+                Intent intent = new Intent(BookDetailsActivity.this, BookEditorActivity.class);
                 intent.setData(mCurrentBookUri);
                 startActivity(intent);
             }

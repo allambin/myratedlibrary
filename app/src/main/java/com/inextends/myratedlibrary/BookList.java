@@ -34,7 +34,7 @@ public class BookList extends AppCompatActivity implements LoaderManager.LoaderC
         booksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Intent intent = new Intent(BookList.this, BookDetails.class);
+                Intent intent = new Intent(BookList.this, BookDetailsActivity.class);
                 Uri currentBookUri = ContentUris.withAppendedId(BookContract.BookEntry.CONTENT_URI, id);
                 intent.setData(currentBookUri);
                 startActivity(intent);
