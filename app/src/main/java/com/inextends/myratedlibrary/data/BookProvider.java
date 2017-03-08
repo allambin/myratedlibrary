@@ -147,9 +147,11 @@ public class BookProvider extends ContentProvider {
     }
 
     private int deleteBook(Uri uri, String selection, String[] selectionArgs) {
+        long bookId = ContentUris.parseId(uri);
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
         int numRowsAffected = database.delete(BookContract.BookEntry.TABLE_NAME, selection, selectionArgs);
         if (numRowsAffected != 0) {
+            deleteBookAuthors(database, bookId);
             getContext().getContentResolver().notifyChange(uri, null);
         }
 
