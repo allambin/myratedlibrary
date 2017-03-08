@@ -119,11 +119,12 @@ public class BookProvider extends ContentProvider {
         }
 
         String[] authorsNamesArray = ArrayUtils.explode(authorsNames);
-        for (int i = 0; i < authorsNamesArray.length; i++) {
-            Log.i(TAG, "insertBook: saving author");
-            long authorId = saveAuthor(database, authorsNamesArray[i]);
-            if (authorId > 0) {
-                saveBookAuthor(database, id, authorId);
+        if (deleteBookAuthors(database, id)) {
+            for (int i = 0; i < authorsNamesArray.length; i++) {
+                long authorId = saveAuthor(database, authorsNamesArray[i]);
+                if (authorId > 0) {
+                    saveBookAuthor(database, id, authorId);
+                }
             }
         }
 
@@ -177,7 +178,7 @@ public class BookProvider extends ContentProvider {
                 throw new IllegalArgumentException("Book requires a title");
             }
         }
-        String authorName = values.getAsString(AuthorContract.AuthorEntry.COLUMN_NAME);
+        String authorsNames = values.getAsString(AuthorContract.AuthorEntry.COLUMN_NAME);
         values.remove(AuthorContract.AuthorEntry.COLUMN_NAME);
 
         int numRowsAffected = database.update(BookContract.BookEntry.TABLE_NAME, values, selection, selectionArgs);
@@ -186,10 +187,13 @@ public class BookProvider extends ContentProvider {
         }
 
         long bookId = ContentUris.parseId(uri);
+        String[] authorsNamesArray = ArrayUtils.explode(authorsNames);
         if (deleteBookAuthors(database, bookId)) {
-            long authorId = saveAuthor(database, authorName);
-            if (authorId > 0) {
-                saveBookAuthor(database, bookId, authorId);
+            for (int i = 0; i < authorsNamesArray.length; i++) {
+                long authorId = saveAuthor(database, authorsNamesArray[i]);
+                if (authorId > 0) {
+                    saveBookAuthor(database, bookId, authorId);
+                }
             }
         }
 
