@@ -11,7 +11,12 @@ import android.widget.TextView;
 import com.inextends.myratedlibrary.data.AuthorContract;
 import com.inextends.myratedlibrary.data.BookContract;
 
+import java.util.ArrayList;
+
 public class BookCursorAdapter extends CursorAdapter {
+
+    private static final String TAG = "BookCursorAdapter";
+    private ArrayList<Long> mHiddenItems = new ArrayList<>();
 
     public BookCursorAdapter(Context context, Cursor c) {
         super(context, c, 0);
@@ -24,16 +29,36 @@ public class BookCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        long currentBookId = cursor.getLong(cursor.getColumnIndexOrThrow(BookContract.BookEntry._ID));
+        if (mHiddenItems.contains(currentBookId)) {
+            return;
+        }
+        mHiddenItems.add(currentBookId);
+
         TextView titleTextView = (TextView) view.findViewById(R.id.text_title);
         String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
         TextView authorNameTextView = (TextView) view.findViewById(R.id.text_author_name);
         String authorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
+        ArrayList<String> authorsNames = new ArrayList<>();
+        authorsNames.add(authorName);
+
+        boolean moveToNext = true;
+        while (moveToNext && cursor.moveToNext()) {
+            long bookId = cursor.getLong(cursor.getColumnIndexOrThrow(BookContract.BookEntry._ID));
+            if (bookId == currentBookId) {
+                String nextAuthorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
+                authorsNames.add(nextAuthorName);
+            } else {
+                moveToNext = false;
+            }
+        }
 
         if (titleTextView != null) {
             titleTextView.setText(title);
         }
         if (authorNameTextView != null) {
-            authorNameTextView.setText(authorName);
+            String[] authorsNamesArray = authorsNames.toArray(new String[0]);
+            authorNameTextView.setText(ArrayUtils.implode(authorsNamesArray));
         }
     }
 }

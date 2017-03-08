@@ -11,6 +11,8 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.inextends.myratedlibrary.ArrayUtils;
+
 public class BookProvider extends ContentProvider {
 
     private static final String TAG = "BookProvider";
@@ -22,6 +24,7 @@ public class BookProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
+        //TODO create an url "books with authors"
         sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS, BOOKS);
         sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS + "/#", BOOKS_ID);
     }
@@ -104,7 +107,7 @@ public class BookProvider extends ContentProvider {
         if (title == null) {
             throw new IllegalArgumentException("Book requires a title");
         }
-        String authorName = values.getAsString(AuthorContract.AuthorEntry.COLUMN_NAME);
+        String authorsNames = values.getAsString(AuthorContract.AuthorEntry.COLUMN_NAME);
         values.remove(AuthorContract.AuthorEntry.COLUMN_NAME);
 
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
@@ -115,9 +118,13 @@ public class BookProvider extends ContentProvider {
             return null;
         }
 
-        long authorId = saveAuthor(database, authorName);
-        if (authorId > 0) {
-            saveBookAuthor(database, id, authorId);
+        String[] authorsNamesArray = ArrayUtils.explode(authorsNames);
+        for (int i = 0; i < authorsNamesArray.length; i++) {
+            Log.i(TAG, "insertBook: saving author");
+            long authorId = saveAuthor(database, authorsNamesArray[i]);
+            if (authorId > 0) {
+                saveBookAuthor(database, id, authorId);
+            }
         }
 
         getContext().getContentResolver().notifyChange(uri, null);
@@ -179,9 +186,11 @@ public class BookProvider extends ContentProvider {
         }
 
         long bookId = ContentUris.parseId(uri);
-        long authorId = saveAuthor(database, authorName);
-        if (authorId > 0) {
-            saveBookAuthor(database, bookId, authorId);
+        if (deleteBookAuthors(database, bookId)) {
+            long authorId = saveAuthor(database, authorName);
+            if (authorId > 0) {
+                saveBookAuthor(database, bookId, authorId);
+            }
         }
 
         return numRowsAffected;
@@ -210,10 +219,6 @@ public class BookProvider extends ContentProvider {
     }
 
     private boolean saveBookAuthor(SQLiteDatabase database, long bookId, long authorId) {
-        String selection = BookAuthorContract.BookAuthorEntry.COLUMN_BOOK_ID + "=?";
-        String[] selectionArgs = new String[]{String.valueOf(bookId)};
-        database.delete(BookAuthorContract.BookAuthorEntry.TABLE_NAME, selection, selectionArgs);
-
         ContentValues bookAuthorValues = new ContentValues();
         bookAuthorValues.put(BookAuthorContract.BookAuthorEntry.COLUMN_AUTHOR_ID, authorId);
         bookAuthorValues.put(BookAuthorContract.BookAuthorEntry.COLUMN_BOOK_ID, bookId);
@@ -223,5 +228,12 @@ public class BookProvider extends ContentProvider {
         }
 
         return true;
+    }
+
+    private boolean deleteBookAuthors(SQLiteDatabase database, long bookId) {
+        String selection = BookAuthorContract.BookAuthorEntry.COLUMN_BOOK_ID + "=?";
+        String[] selectionArgs = new String[]{String.valueOf(bookId)};
+        int rowsAffected = database.delete(BookAuthorContract.BookAuthorEntry.TABLE_NAME, selection, selectionArgs);
+        return rowsAffected > -1;
     }
 }

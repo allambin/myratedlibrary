@@ -16,11 +16,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.inextends.myratedlibrary.data.AuthorContract;
 import com.inextends.myratedlibrary.data.BookContract;
 import com.inextends.myratedlibrary.data.BookDbHelper;
+
+import java.util.ArrayList;
 
 public class BookEditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -28,9 +32,13 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
     private EditText mBookTitleEditText;
     private EditText mBookCommentEditText;
     private EditText mBookAuthorNameEditText;
+    private LinearLayout mContainerAuthor;
     private BookDbHelper mDbHelper;
     private Uri mCurrentBookUri;
     private static final int EXISTING_BOOK_LOADER_ID = 2;
+    private ArrayList<EditText> mAuthorNameEditTexts = new ArrayList<>();
+
+    private static final String TAG = "BookEditorActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +55,9 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         mBookTitleEditText = (EditText) findViewById(R.id.edit_title);
         mBookCommentEditText = (EditText) findViewById(R.id.edit_comment);
         mBookAuthorNameEditText = (EditText) findViewById(R.id.edit_author);
+        mContainerAuthor = (LinearLayout) findViewById(R.id.container_author);
+
+        mAuthorNameEditTexts.add(mBookAuthorNameEditText);
 
         mDbHelper = new BookDbHelper(this);
 
@@ -54,6 +65,25 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
             @Override
             public void onClick(View view) {
                 saveBook();
+            }
+        });
+
+        ImageButton buttonAuthor = (ImageButton) findViewById(R.id.button_author);
+        buttonAuthor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LinearLayout layout = new LinearLayout(BookEditorActivity.this);
+                layout.setOrientation(LinearLayout.HORIZONTAL);
+                layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
+                EditText authorEditText = new EditText(BookEditorActivity.this);
+                authorEditText.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                authorEditText.setHint(R.string.author);
+                layout.addView(authorEditText);
+
+                mAuthorNameEditTexts.add(authorEditText);
+
+                mContainerAuthor.addView(layout);
             }
         });
     }
@@ -85,10 +115,17 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         String comment = mBookCommentEditText.getText().toString().trim();
         String authorName = mBookAuthorNameEditText.getText().toString().trim();
 
+        String[] authorNames = new String[mAuthorNameEditTexts.size()];
+        int i = 0;
+        for (EditText editText : mAuthorNameEditTexts) {
+            authorNames[i++] = editText.getText().toString();
+        }
+        String authorsNamesString = ArrayUtils.implode(authorNames);
+
         ContentValues values = new ContentValues();
         values.put(BookContract.BookEntry.COLUMN_TITLE, title);
         values.put(BookContract.BookEntry.COLUMN_COMMENT, comment);
-        values.put(AuthorContract.AuthorEntry.COLUMN_NAME, authorName);
+        values.put(AuthorContract.AuthorEntry.COLUMN_NAME, authorsNamesString);
 
         if (mCurrentBookUri == null) {
             Uri result = getContentResolver().insert(BookContract.BookEntry.CONTENT_URI, values);
