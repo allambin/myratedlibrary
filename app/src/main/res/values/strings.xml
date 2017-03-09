@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">My Rated Library</string>
+    <string name="books">Books</string>
+    <string name="authors">Authors</string>
     <string name="title">Title</string>
     <string name="author">Author</string>
     <string name="comment">Comment</string>
