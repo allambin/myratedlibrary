@@ -7,7 +7,9 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.TextView;
 
 import com.inextends.myratedlibrary.data.AuthorContract;
@@ -30,6 +32,16 @@ public class AuthorDetailsActivity extends AppCompatActivity implements LoaderMa
         }
 
         mAuthorNameTextView = (TextView) findViewById(R.id.toolbar_title);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AuthorDetailsActivity.this, AuthorEditorActivity.class);
+                intent.setData(mCurrentAuthorUri);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

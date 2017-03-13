@@ -25,4 +25,22 @@ class AuthorRepository {
 
         return ContentUris.withAppendedId(uri, id);
     }
+
+    static int update(Context context, BookDbHelper dbHelper, Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+        if (values.containsKey(AuthorContract.AuthorEntry.COLUMN_NAME)) {
+            String name = values.getAsString(AuthorContract.AuthorEntry.COLUMN_NAME);
+            if (name == null) {
+                throw new IllegalArgumentException("Author requires a name");
+            }
+        }
+
+        int numRowsAffected = database.update(AuthorContract.AuthorEntry.TABLE_NAME, values, selection, selectionArgs);
+        if (numRowsAffected != 0) {
+            context.getContentResolver().notifyChange(uri, null);
+        }
+
+        return numRowsAffected;
+    }
 }
