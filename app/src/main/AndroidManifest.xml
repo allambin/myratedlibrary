@@ -23,7 +23,9 @@
             android:exported="false" />
 
         <activity android:name=".BookDetailsActivity" />
-        <!--<activity android:name=".MainActivity"></activity>-->
+        <!-- <activity android:name=".MainActivity"></activity> -->
+        <activity android:name=".AuthorEditorActivity" />
+        <activity android:name=".AuthorDetailsActivity"></activity>
     </application>
 
 </manifest>

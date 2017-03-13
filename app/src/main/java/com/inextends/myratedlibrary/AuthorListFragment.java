@@ -1,5 +1,6 @@
 package com.inextends.myratedlibrary;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -46,6 +47,8 @@ public class AuthorListFragment extends Fragment implements LoaderManager.Loader
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent(getContext(), AuthorEditorActivity.class);
+                startActivity(intent);
             }
         });
     }

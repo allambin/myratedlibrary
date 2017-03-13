@@ -105,6 +105,8 @@ public class BookProvider extends ContentProvider {
         switch (match) {
             case BOOKS:
                 return insertBook(uri, contentValues);
+            case AUTHORS:
+                return AuthorRepository.insert(getContext(), mDbHelper, uri, contentValues);
             default:
                 throw new IllegalArgumentException("Insertion is not supported for " + uri);
         }

@@ -5,6 +5,7 @@
     <string name="title">Title</string>
     <string name="author">Author</string>
     <string name="comment">Comment</string>
+    <string name="name">Name</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="insert_book_failure">Could not insert book</string>
@@ -13,4 +14,8 @@
     <string name="update_book_success">The book has been updated</string>
     <string name="delete_book_failure">Could not delete book</string>
     <string name="delete_book_success">The book has been deleted</string>
+    <string name="insert_author_failure">Could not insert author</string>
+    <string name="insert_author_success">The author has been saved</string>
+    <string name="update_author_failure">Could not update author</string>
+    <string name="update_author_success">The author has been updated</string>
 </resources>
