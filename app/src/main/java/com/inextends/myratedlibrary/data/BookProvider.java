@@ -20,6 +20,8 @@ public class BookProvider extends ContentProvider {
     private BookDbHelper mDbHelper;
     private static final int BOOKS = 100;
     private static final int BOOKS_ID = 101;
+    private static final int AUTHORS = 102;
+    private static final int AUTHORS_ID = 103;
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -27,6 +29,8 @@ public class BookProvider extends ContentProvider {
         //TODO create an url "books with authors"
         sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS, BOOKS);
         sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS + "/#", BOOKS_ID);
+        sUriMatcher.addURI(AuthorContract.CONTENT_AUTHORITY, AuthorContract.PATH_AUTHORS, AUTHORS);
+        sUriMatcher.addURI(AuthorContract.CONTENT_AUTHORITY, AuthorContract.PATH_AUTHORS + "/#", AUTHORS_ID);
     }
 
     @Override
@@ -69,6 +73,10 @@ public class BookProvider extends ContentProvider {
                 cursor = database.rawQuery(sql, selectionArgs);
                 //cursor = database.query(BookContract.BookEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
+            case AUTHORS: {
+                cursor = database.query(AuthorContract.AuthorEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            }
             default:
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);
         }
