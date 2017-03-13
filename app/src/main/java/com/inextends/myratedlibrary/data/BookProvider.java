@@ -77,6 +77,11 @@ public class BookProvider extends ContentProvider {
                 cursor = database.query(AuthorContract.AuthorEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             }
+            case AUTHORS_ID:
+                selection = AuthorContract.AuthorEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = database.query(AuthorContract.AuthorEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
             default:
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);
         }

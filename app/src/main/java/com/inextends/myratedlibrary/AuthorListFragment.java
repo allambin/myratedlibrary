@@ -1,7 +1,9 @@
 package com.inextends.myratedlibrary;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -40,6 +42,10 @@ public class AuthorListFragment extends Fragment implements LoaderManager.Loader
         authorsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Intent intent = new Intent(getContext(), AuthorDetailsActivity.class);
+                Uri currentAuthorUri = ContentUris.withAppendedId(AuthorContract.AuthorEntry.CONTENT_URI, id);
+                intent.setData(currentAuthorUri);
+                startActivity(intent);
             }
         });
 
