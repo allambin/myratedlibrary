@@ -17,6 +17,7 @@ public class BookCursorAdapter extends CursorAdapter {
 
     private static final String TAG = "BookCursorAdapter";
     private ArrayList<Long> mHiddenItems = new ArrayList<>();
+    private int mParentViewId;
 
     public BookCursorAdapter(Context context, Cursor c) {
         super(context, c, 0);
@@ -24,20 +25,42 @@ public class BookCursorAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.book_item, parent, false);
+        int layout = R.layout.book_item;
+        if (mParentViewId == R.id.list_author_books) {
+            layout = R.layout.book_item_for_author;
+        }
+        return LayoutInflater.from(context).inflate(layout, parent, false);
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (mParentViewId == 0) {
+            mParentViewId = parent.getId();
+        }
+        return super.getView(position, convertView, parent);
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         long currentBookId = cursor.getLong(cursor.getColumnIndexOrThrow(BookContract.BookEntry._ID));
+
+        TextView titleTextView = (TextView) view.findViewById(R.id.text_title);
+        TextView authorNameTextView = (TextView) view.findViewById(R.id.text_author_name);
+
+        if (mParentViewId == R.id.list_author_books) { // we are in the author details page
+            String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
+            if (titleTextView != null) {
+                titleTextView.setText(title);
+            }
+            return;
+        }
+
         if (mHiddenItems.contains(currentBookId)) {
             return;
         }
         mHiddenItems.add(currentBookId);
 
-        TextView titleTextView = (TextView) view.findViewById(R.id.text_title);
         String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
-        TextView authorNameTextView = (TextView) view.findViewById(R.id.text_author_name);
         String authorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
         ArrayList<String> authorsNames = new ArrayList<>();
         authorsNames.add(authorName);

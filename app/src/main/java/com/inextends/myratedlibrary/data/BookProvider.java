@@ -20,6 +20,7 @@ public class BookProvider extends ContentProvider {
     private BookDbHelper mDbHelper;
     private static final int BOOKS = 100;
     private static final int BOOKS_ID = 101;
+    private static final int BOOKS_FROM_AUTHOR = 104;
     private static final int AUTHORS = 102;
     private static final int AUTHORS_ID = 103;
 
@@ -29,6 +30,7 @@ public class BookProvider extends ContentProvider {
         //TODO create an url "books with authors"
         sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS, BOOKS);
         sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS + "/#", BOOKS_ID);
+        sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS + "/authorid/#", BOOKS_FROM_AUTHOR);
         sUriMatcher.addURI(AuthorContract.CONTENT_AUTHORITY, AuthorContract.PATH_AUTHORS, AUTHORS);
         sUriMatcher.addURI(AuthorContract.CONTENT_AUTHORITY, AuthorContract.PATH_AUTHORS + "/#", AUTHORS_ID);
     }
@@ -72,6 +74,9 @@ public class BookProvider extends ContentProvider {
                         "WHERE b." + BookContract.BookEntry._ID + "=?";
                 cursor = database.rawQuery(sql, selectionArgs);
                 //cursor = database.query(BookContract.BookEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case BOOKS_FROM_AUTHOR:
+                cursor = BookSqlHelper.getBooksFromAuthor(database, uri, projection, selection, selectionArgs, sortOrder);
                 break;
             case AUTHORS: {
                 cursor = database.query(AuthorContract.AuthorEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
