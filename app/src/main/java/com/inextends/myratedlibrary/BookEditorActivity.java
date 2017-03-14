@@ -14,10 +14,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FilterQueryProvider;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import com.inextends.myratedlibrary.data.AuthorContract;
@@ -31,12 +34,14 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
     private Button mSaveBookButton;
     private EditText mBookTitleEditText;
     private EditText mBookCommentEditText;
-    private EditText mBookAuthorNameEditText;
+    private AutoCompleteTextView mBookAuthorNameAutocomplete;
     private LinearLayout mContainerAuthor;
     private BookDbHelper mDbHelper;
     private Uri mCurrentBookUri;
     private static final int EXISTING_BOOK_LOADER_ID = 2;
     private ArrayList<EditText> mAuthorNameEditTexts = new ArrayList<>();
+
+    SimpleCursorAdapter mAuthorAutocompleteAdapter;
 
     private static final String TAG = "BookEditorActivity";
 
@@ -54,12 +59,38 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         mSaveBookButton = (Button) findViewById(R.id.button_save);
         mBookTitleEditText = (EditText) findViewById(R.id.edit_title);
         mBookCommentEditText = (EditText) findViewById(R.id.edit_comment);
-        mBookAuthorNameEditText = (EditText) findViewById(R.id.edit_author);
+        mBookAuthorNameAutocomplete = (AutoCompleteTextView) findViewById(R.id.autocomplete_author);
         mContainerAuthor = (LinearLayout) findViewById(R.id.container_author);
 
-        mAuthorNameEditTexts.add(mBookAuthorNameEditText);
+        mAuthorNameEditTexts.add(mBookAuthorNameAutocomplete);
 
+        int[] to = new int[]{R.id.text_author_name};
+        String[] from = new String[]{AuthorContract.AuthorEntry.COLUMN_NAME};
         mDbHelper = new BookDbHelper(this);
+        mAuthorAutocompleteAdapter = new SimpleCursorAdapter(
+                this, R.layout.autocomplete_author, null, from, to, 0
+        );
+        mBookAuthorNameAutocomplete.setAdapter(mAuthorAutocompleteAdapter);
+        mAuthorAutocompleteAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
+            @Override
+            public CharSequence convertToString(Cursor cursor) {
+                final int columnIndex = cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME);
+                final String str = cursor.getString(columnIndex);
+                return str;
+            }
+        });
+        mAuthorAutocompleteAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence str) {
+                String select = "(" + AuthorContract.AuthorEntry.COLUMN_NAME + " LIKE ?) ";
+                String[] selectArgs = {"%" + str + "%"};
+                String[] contactsProjection = new String[]{
+                        AuthorContract.AuthorEntry._ID,
+                        AuthorContract.AuthorEntry.COLUMN_NAME};
+
+                return getContentResolver().query(AuthorContract.AuthorEntry.CONTENT_URI, contactsProjection, select, selectArgs, null);
+            }
+        });
 
         mSaveBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,7 +133,7 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
             return;
         }
         String comment = mBookCommentEditText.getText().toString().trim();
-        String authorName = mBookAuthorNameEditText.getText().toString().trim();
+        String authorName = mBookAuthorNameAutocomplete.getText().toString().trim();
 
         String[] authorNames = new String[mAuthorNameEditTexts.size()];
         int i = 0;
@@ -207,7 +238,7 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
     public void onLoaderReset(Loader<Cursor> loader) {
         mBookTitleEditText.setText("");
         mBookCommentEditText.setText("");
-        mBookAuthorNameEditText.setText("");
+        mBookAuthorNameAutocomplete.setText("");
     }
 
     private void createAuthorNameEditText() {
@@ -219,13 +250,14 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         layout.setOrientation(LinearLayout.HORIZONTAL);
         layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
 
-        EditText authorEditText = new EditText(BookEditorActivity.this);
-        authorEditText.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        authorEditText.setHint(R.string.author);
-        authorEditText.setText(value);
-        layout.addView(authorEditText);
+        AutoCompleteTextView authorAutoComplete = new AutoCompleteTextView(BookEditorActivity.this);
+        authorAutoComplete.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        authorAutoComplete.setHint(R.string.author);
+        authorAutoComplete.setText(value);
+        authorAutoComplete.setAdapter(mAuthorAutocompleteAdapter);
+        layout.addView(authorAutoComplete);
 
-        mAuthorNameEditTexts.add(authorEditText);
+        mAuthorNameEditTexts.add(authorAutoComplete);
 
         mContainerAuthor.addView(layout);
     }

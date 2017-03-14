@@ -56,14 +56,12 @@
                 android:layout_weight="2"
                 android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/edit_author"
+                <AutoCompleteTextView
+                    android:id="@+id/autocomplete_author"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="4"
-                    android:ems="10"
-                    android:hint="@string/author"
-                    android:inputType="textPersonName" />
+                    android:hint="@string/author" />
 
                 <ImageButton
                     android:id="@+id/button_author"
