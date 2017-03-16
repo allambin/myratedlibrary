@@ -21,6 +21,10 @@ class StarsHandler {
         mStarsImageViews.add((ImageView) view.findViewById(R.id.image_star_5));
     }
 
+    public void clearStarImageViews() {
+        mStarsImageViews.clear();
+    }
+
     private void switchStarsStatus() {
         for (int i = 0; i < mCount; i++) {
             mStarsImageViews.get(i).setImageResource(android.R.drawable.btn_star_big_on);

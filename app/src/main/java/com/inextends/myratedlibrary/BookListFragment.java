@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.inextends.myratedlibrary.data.AuthorContract;
 import com.inextends.myratedlibrary.data.BookContract;
 
 public class BookListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -71,7 +70,8 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
         String[] projection = {
                 BookContract.BookEntry._ID,
                 BookContract.BookEntry.COLUMN_TITLE,
-                AuthorContract.AuthorEntry.COLUMN_NAME
+                BookContract.BookEntry.COLUMN_RATING,
+                BookContract.BookEntry.COLUMN_AUTHORS
         };
         return new CursorLoader(getContext(), BookContract.BookEntry.CONTENT_URI, projection, null, null, null);
     }

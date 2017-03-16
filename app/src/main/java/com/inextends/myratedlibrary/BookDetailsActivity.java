@@ -12,10 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
-import com.inextends.myratedlibrary.data.AuthorContract;
 import com.inextends.myratedlibrary.data.BookContract;
-
-import java.util.ArrayList;
 
 public class BookDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -56,6 +53,8 @@ public class BookDetailsActivity extends AppCompatActivity implements LoaderMana
         String[] projection = {
                 BookContract.BookEntry._ID,
                 BookContract.BookEntry.COLUMN_TITLE,
+                BookContract.BookEntry.COLUMN_RATING,
+                BookContract.BookEntry.COLUMN_AUTHORS,
                 BookContract.BookEntry.COLUMN_COMMENT
         };
         return new CursorLoader(this, mCurrentBookUri, projection, null, null, null);
@@ -67,18 +66,14 @@ public class BookDetailsActivity extends AppCompatActivity implements LoaderMana
             return;
         }
 
-        ArrayList<String> authorsNames = new ArrayList<>();
-
         if (cursor.moveToFirst()) {
             String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
             String comment = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_COMMENT));
-            String authorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
+            String authorsNames = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_AUTHORS));
             mBookTitleTextView.setText(title);
             mBookCommentTextView.setText(comment);
-            authorsNames.add(authorName);
+            mAuthorNameTextView.setText(authorsNames);
         }
-
-        mAuthorNameTextView.setText(ArrayUtils.implode(", ", BookCursorUtils.getNextAuthorsNames(cursor, authorsNames)));
     }
 
     @Override

@@ -23,7 +23,6 @@ public class BookProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        //TODO create an url "books with authors"
         sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS, BOOKS);
         sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS + "/#", BOOKS_ID);
         sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS + "/authorid/#", BOOKS_FROM_AUTHOR);
@@ -47,11 +46,13 @@ public class BookProvider extends ContentProvider {
         int match = sUriMatcher.match(uri);
         switch (match) {
             case BOOKS: {
-                cursor = BookRepository.fetchAllWithAuthors(database, selectionArgs);
+                cursor = BookRepository.fetchAll(database, projection, selection, selectionArgs, sortOrder);
                 break;
             }
             case BOOKS_ID:
-                cursor = BookRepository.fetchWithAuthors(database, uri, selectionArgs);
+                selection = BookContract.BookEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = BookRepository.fetchOne(database, projection, selection, selectionArgs, sortOrder);
                 break;
             case BOOKS_FROM_AUTHOR:
                 cursor = BookSqlHelper.getBooksFromAuthor(database, uri, projection, selection, selectionArgs, sortOrder);

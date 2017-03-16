@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-import com.inextends.myratedlibrary.data.AuthorContract;
 import com.inextends.myratedlibrary.data.BookContract;
 
 import java.util.ArrayList;
@@ -43,10 +42,9 @@ public class BookCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        long currentBookId = cursor.getLong(cursor.getColumnIndexOrThrow(BookContract.BookEntry._ID));
+        mStarsHandler.clearStarImageViews();
 
         TextView titleTextView = (TextView) view.findViewById(R.id.text_title);
-        TextView authorNameTextView = (TextView) view.findViewById(R.id.text_author_name);
 
         if (mParentViewId == R.id.list_author_books) { // we are in the author details page
             String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
@@ -56,35 +54,19 @@ public class BookCursorAdapter extends CursorAdapter {
             return;
         }
 
-        if (mHiddenItems.contains(currentBookId)) {
-            return;
-        }
-        mHiddenItems.add(currentBookId);
+        TextView authorNameTextView = (TextView) view.findViewById(R.id.text_author_name);
 
         String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
         int rating = cursor.getInt(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_RATING));
-        String authorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
-        ArrayList<String> authorsNames = new ArrayList<>();
-        authorsNames.add(authorName);
-        mStarsHandler.setStarsImageViews(view);
+        String authorsNames = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_AUTHORS));
 
-        boolean moveToNext = true;
-        while (moveToNext && cursor.moveToNext()) {
-            long bookId = cursor.getLong(cursor.getColumnIndexOrThrow(BookContract.BookEntry._ID));
-            if (bookId == currentBookId) {
-                String nextAuthorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
-                authorsNames.add(nextAuthorName);
-            } else {
-                moveToNext = false;
-            }
-        }
+        mStarsHandler.setStarsImageViews(view);
 
         if (titleTextView != null) {
             titleTextView.setText(title);
         }
         if (authorNameTextView != null) {
-            String[] authorsNamesArray = authorsNames.toArray(new String[0]);
-            authorNameTextView.setText(ArrayUtils.implode(authorsNamesArray));
+            authorNameTextView.setText(authorsNames);
         }
 
         mStarsHandler.displayStarsStatus(rating);

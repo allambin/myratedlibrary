@@ -138,7 +138,6 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
             return;
         }
         String comment = mBookCommentEditText.getText().toString().trim();
-        String authorName = mBookAuthorNameAutocomplete.getText().toString().trim();
 
         String[] authorNames = new String[mAuthorNameEditTexts.size()];
         int i = 0;
@@ -151,7 +150,7 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         values.put(BookContract.BookEntry.COLUMN_TITLE, title);
         values.put(BookContract.BookEntry.COLUMN_COMMENT, comment);
         values.put(BookContract.BookEntry.COLUMN_RATING, mStarsHandler.getStarsCount());
-        values.put(AuthorContract.AuthorEntry.COLUMN_NAME, authorsNamesString);
+        values.put(BookContract.BookEntry.COLUMN_AUTHORS, authorsNamesString);
 
         if (mCurrentBookUri == null) {
             Uri result = getContentResolver().insert(BookContract.BookEntry.CONTENT_URI, values);
@@ -203,7 +202,9 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         String[] projection = {
                 BookContract.BookEntry._ID,
                 BookContract.BookEntry.COLUMN_TITLE,
-                BookContract.BookEntry.COLUMN_COMMENT
+                BookContract.BookEntry.COLUMN_COMMENT,
+                BookContract.BookEntry.COLUMN_RATING,
+                BookContract.BookEntry.COLUMN_AUTHORS
         };
         return new CursorLoader(this, mCurrentBookUri, projection, null, null, null);
     }
@@ -214,20 +215,18 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
             return;
         }
 
-        ArrayList<String> authorsNames = new ArrayList<>();
+        String[] authorsNamesArray = null;
 
         if (cursor.moveToFirst()) {
             String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
             int rating = cursor.getInt(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_RATING));
             String comment = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_COMMENT));
-            String authorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
+            String authorsNamesString = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_AUTHORS));
+            authorsNamesArray = ArrayUtils.explode(authorsNamesString);
             mBookTitleEditText.setText(title);
             mBookCommentEditText.setText(comment);
-            authorsNames.add(authorName);
             mStarsHandler.displayStarsStatus(rating);
         }
-
-        String[] authorsNamesArray = BookCursorUtils.getNextAuthorsNames(cursor, authorsNames);
 
         // If we have more authors names than available Edit Texts, we create some.
         if (mAuthorNameEditTexts.size() < authorsNamesArray.length) {

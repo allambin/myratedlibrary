@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -38,13 +39,25 @@ class BookRepository {
         return database.rawQuery(sql, selectionArgs);
     }
 
+    static Cursor fetchAll(SQLiteDatabase database, String[] projection, String selection, String[] selectionArgs,
+                           String sortOrder) {
+        return database.query(BookContract.BookEntry.TABLE_NAME, projection, selection, selectionArgs,
+                null, null, sortOrder);
+    }
+
+    static Cursor fetchOne(SQLiteDatabase database, String[] projection, String selection, String[] selectionArgs,
+                           String sortOrder) {
+        return database.query(BookContract.BookEntry.TABLE_NAME, projection, selection, selectionArgs,
+                null, null, sortOrder);
+    }
+
+    @Nullable
     static Uri insertWithAuthors(Context context, BookDbHelper dbHelper, Uri uri, ContentValues values) {
         String title = values.getAsString(BookContract.BookEntry.COLUMN_TITLE);
         if (title == null) {
             throw new IllegalArgumentException("Book requires a title");
         }
-        String authorsNames = values.getAsString(AuthorContract.AuthorEntry.COLUMN_NAME);
-        values.remove(AuthorContract.AuthorEntry.COLUMN_NAME);
+        String authorsNames = values.getAsString(BookContract.BookEntry.COLUMN_AUTHORS);
 
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         long id = database.insert(BookContract.BookEntry.TABLE_NAME, null, values);
@@ -78,8 +91,7 @@ class BookRepository {
                 throw new IllegalArgumentException("Book requires a title");
             }
         }
-        String authorsNames = values.getAsString(AuthorContract.AuthorEntry.COLUMN_NAME);
-        values.remove(AuthorContract.AuthorEntry.COLUMN_NAME);
+        String authorsNames = values.getAsString(BookContract.BookEntry.COLUMN_AUTHORS);
 
         int numRowsAffected = database.update(BookContract.BookEntry.TABLE_NAME, values, selection, selectionArgs);
         if (numRowsAffected != 0) {

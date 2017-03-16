@@ -44,6 +44,10 @@ public class BookDbHelper extends SQLiteOpenHelper {
             "ALTER TABLE " + BookContract.BookEntry.TABLE_NAME + " ADD COLUMN " +
                     BookContract.BookEntry.COLUMN_RATING + " INTEGER NOT NULL DEFAULT 0";
 
+    private static final String SQL_ADD_AUTHORS_COLUMN =
+            "ALTER TABLE " + BookContract.BookEntry.TABLE_NAME + " ADD COLUMN " +
+                    BookContract.BookEntry.COLUMN_AUTHORS + " TEXT";
+
     public BookDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -61,7 +65,12 @@ public class BookDbHelper extends SQLiteOpenHelper {
         try {
             sqLiteDatabase.execSQL(SQL_ADD_RATING_COLUMN);
         } catch (SQLException e) {
-            Log.d(TAG, "onCreate: could not add comment rating, is probably already there");
+            Log.d(TAG, "onCreate: could not add rating column, is probably already there");
+        }
+        try {
+            sqLiteDatabase.execSQL(SQL_ADD_AUTHORS_COLUMN);
+        } catch (SQLException e) {
+            Log.d(TAG, "onCreate: could not add authors column, is probably already there");
         }
     }
 
