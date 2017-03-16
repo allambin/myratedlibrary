@@ -41,12 +41,12 @@ public class AuthorEditorActivity extends AppCompatActivity implements LoaderMan
         mSaveAuthorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveAuhor();
+                saveAuthor();
             }
         });
     }
 
-    private void saveAuhor() {
+    private void saveAuthor() {
         String name = mAuthorNameEditText.getText().toString().trim();
         if (mCurrentAuthorUri == null && TextUtils.isEmpty(name)) {
             return;
