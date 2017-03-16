@@ -18,6 +18,7 @@ public class BookCursorAdapter extends CursorAdapter {
     private static final String TAG = "BookCursorAdapter";
     private ArrayList<Long> mHiddenItems = new ArrayList<>();
     private int mParentViewId;
+    private StarsHandler mStarsHandler = new StarsHandler();
 
     public BookCursorAdapter(Context context, Cursor c) {
         super(context, c, 0);
@@ -61,9 +62,11 @@ public class BookCursorAdapter extends CursorAdapter {
         mHiddenItems.add(currentBookId);
 
         String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
+        int rating = cursor.getInt(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_RATING));
         String authorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
         ArrayList<String> authorsNames = new ArrayList<>();
         authorsNames.add(authorName);
+        mStarsHandler.setStarsImageViews(view);
 
         boolean moveToNext = true;
         while (moveToNext && cursor.moveToNext()) {
@@ -83,5 +86,7 @@ public class BookCursorAdapter extends CursorAdapter {
             String[] authorsNamesArray = authorsNames.toArray(new String[0]);
             authorNameTextView.setText(ArrayUtils.implode(authorsNamesArray));
         }
+
+        mStarsHandler.displayStarsStatus(rating);
     }
 }

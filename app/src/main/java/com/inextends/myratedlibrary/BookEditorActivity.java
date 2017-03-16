@@ -40,6 +40,7 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
     private Uri mCurrentBookUri;
     private static final int EXISTING_BOOK_LOADER_ID = 2;
     private ArrayList<EditText> mAuthorNameEditTexts = new ArrayList<>();
+    private StarsHandler mStarsHandler = new StarsHandler();
 
     SimpleCursorAdapter mAuthorAutocompleteAdapter;
 
@@ -63,6 +64,10 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         mContainerAuthor = (LinearLayout) findViewById(R.id.container_author);
 
         mAuthorNameEditTexts.add(mBookAuthorNameAutocomplete);
+
+        View rootView = findViewById(android.R.id.content);
+        mStarsHandler.setStarsImageViews(rootView);
+        mStarsHandler.handleStarsClick();
 
         int[] to = new int[]{R.id.text_author_name};
         String[] from = new String[]{AuthorContract.AuthorEntry.COLUMN_NAME};
@@ -145,6 +150,7 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
         ContentValues values = new ContentValues();
         values.put(BookContract.BookEntry.COLUMN_TITLE, title);
         values.put(BookContract.BookEntry.COLUMN_COMMENT, comment);
+        values.put(BookContract.BookEntry.COLUMN_RATING, mStarsHandler.getStarsCount());
         values.put(AuthorContract.AuthorEntry.COLUMN_NAME, authorsNamesString);
 
         if (mCurrentBookUri == null) {
@@ -212,11 +218,13 @@ public class BookEditorActivity extends AppCompatActivity implements LoaderManag
 
         if (cursor.moveToFirst()) {
             String title = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_TITLE));
+            int rating = cursor.getInt(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_RATING));
             String comment = cursor.getString(cursor.getColumnIndexOrThrow(BookContract.BookEntry.COLUMN_COMMENT));
             String authorName = cursor.getString(cursor.getColumnIndexOrThrow(AuthorContract.AuthorEntry.COLUMN_NAME));
             mBookTitleEditText.setText(title);
             mBookCommentEditText.setText(comment);
             authorsNames.add(authorName);
+            mStarsHandler.displayStarsStatus(rating);
         }
 
         String[] authorsNamesArray = BookCursorUtils.getNextAuthorsNames(cursor, authorsNames);

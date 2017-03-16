@@ -51,7 +51,8 @@ public class BookProvider extends ContentProvider {
         int match = sUriMatcher.match(uri);
         switch (match) {
             case BOOKS: {
-                String sql = "SELECT b." + BookContract.BookEntry._ID + " as _id, " + BookContract.BookEntry.COLUMN_TITLE + ", " + AuthorContract.AuthorEntry.COLUMN_NAME + " " +
+                String sql = "SELECT b." + BookContract.BookEntry._ID + " as _id, " + BookContract.BookEntry.COLUMN_TITLE + ", " +
+                        BookContract.BookEntry.COLUMN_RATING + ", " + AuthorContract.AuthorEntry.COLUMN_NAME + " " +
                         "FROM " + BookContract.BookEntry.TABLE_NAME + " as b " +
                         "INNER JOIN " + BookAuthorContract.BookAuthorEntry.TABLE_NAME + " as ba " +
                         "ON ba." + BookAuthorContract.BookAuthorEntry.COLUMN_BOOK_ID + " = b." + BookAuthorContract.BookAuthorEntry._ID + " " +
@@ -65,7 +66,7 @@ public class BookProvider extends ContentProvider {
                 //selection = BookContract.BookEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 String sql = "SELECT b." + BookContract.BookEntry._ID + " as _id, " + BookContract.BookEntry.COLUMN_TITLE + ", " +
-                        AuthorContract.AuthorEntry.COLUMN_NAME + ", " + BookContract.BookEntry.COLUMN_COMMENT + " " +
+                        BookContract.BookEntry.COLUMN_RATING + ", " + AuthorContract.AuthorEntry.COLUMN_NAME + ", " + BookContract.BookEntry.COLUMN_COMMENT + " " +
                         "FROM " + BookContract.BookEntry.TABLE_NAME + " as b " +
                         "INNER JOIN " + BookAuthorContract.BookAuthorEntry.TABLE_NAME + " as ba " +
                         "ON ba." + BookAuthorContract.BookAuthorEntry.COLUMN_BOOK_ID + " = b." + BookAuthorContract.BookAuthorEntry._ID + " " +

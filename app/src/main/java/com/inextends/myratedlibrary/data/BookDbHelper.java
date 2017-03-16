@@ -40,6 +40,10 @@ public class BookDbHelper extends SQLiteOpenHelper {
                     "REFERENCES " + AuthorContract.AuthorEntry.TABLE_NAME + "(" + AuthorContract.AuthorEntry._ID + ")" +
                     "CONSTRAINT unique_fks UNIQUE(" + BookAuthorContract.BookAuthorEntry.COLUMN_BOOK_ID + ", " + BookAuthorContract.BookAuthorEntry.COLUMN_AUTHOR_ID + "))";
 
+    private static final String SQL_ADD_RATING_COLUMN =
+            "ALTER TABLE " + BookContract.BookEntry.TABLE_NAME + " ADD COLUMN " +
+                    BookContract.BookEntry.COLUMN_RATING + " INTEGER NOT NULL DEFAULT 0";
+
     public BookDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -54,6 +58,11 @@ public class BookDbHelper extends SQLiteOpenHelper {
         }
         sqLiteDatabase.execSQL(SQL_CREATE_AUTHORS_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_BOOKS_AUTHORS_TABLE);
+        try {
+            sqLiteDatabase.execSQL(SQL_ADD_RATING_COLUMN);
+        } catch (SQLException e) {
+            Log.d(TAG, "onCreate: could not add comment rating, is probably already there");
+        }
     }
 
     @Override

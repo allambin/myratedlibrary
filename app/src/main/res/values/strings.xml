@@ -6,6 +6,7 @@
     <string name="author">Author</string>
     <string name="comment">Comment</string>
     <string name="name">Name</string>
+    <string name="rating">Rating</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="insert_book_failure">Could not insert book</string>
