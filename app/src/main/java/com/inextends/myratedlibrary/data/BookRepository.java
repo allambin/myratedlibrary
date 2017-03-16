@@ -70,7 +70,7 @@ class BookRepository {
         String[] authorsNamesArray = ArrayUtils.explode(authorsNames);
         if (deleteBookAuthors(database, id)) {
             for (int i = 0; i < authorsNamesArray.length; i++) {
-                long authorId = saveAuthor(database, authorsNamesArray[i]);
+                long authorId = saveAuthor(context, database, authorsNamesArray[i]);
                 if (authorId > 0) {
                     saveBookAuthor(database, id, authorId);
                 }
@@ -102,7 +102,7 @@ class BookRepository {
         String[] authorsNamesArray = ArrayUtils.explode(authorsNames);
         if (deleteBookAuthors(database, bookId)) {
             for (int i = 0; i < authorsNamesArray.length; i++) {
-                long authorId = saveAuthor(database, authorsNamesArray[i]);
+                long authorId = saveAuthor(context, database, authorsNamesArray[i]);
                 if (authorId > 0) {
                     saveBookAuthor(database, bookId, authorId);
                 }
@@ -124,7 +124,7 @@ class BookRepository {
         return numRowsAffected;
     }
 
-    private static long saveAuthor(SQLiteDatabase database, String authorName) {
+    private static long saveAuthor(Context context, SQLiteDatabase database, String authorName) {
         long authorId = 0;
         if (authorName != null && !TextUtils.isEmpty(authorName)) {
             ContentValues authorValues = new ContentValues();
@@ -132,7 +132,7 @@ class BookRepository {
             authorId = database.insertWithOnConflict(AuthorContract.AuthorEntry.TABLE_NAME, null, authorValues, SQLiteDatabase.CONFLICT_IGNORE);
         }
 
-        if (authorId == -1) {
+        if (authorId == -1) { // author was already in DB
             String sql = "SELECT " + AuthorContract.AuthorEntry._ID + " " +
                     "FROM " + AuthorContract.AuthorEntry.TABLE_NAME + " " +
                     "WHERE " + AuthorContract.AuthorEntry.COLUMN_NAME + " = ?";
@@ -141,6 +141,8 @@ class BookRepository {
                 cursor.moveToFirst();
                 authorId = cursor.getLong(cursor.getColumnIndex("_id"));
             }
+        } else {
+            context.getContentResolver().notifyChange(AuthorContract.AuthorEntry.CONTENT_URI, null);
         }
 
         return authorId;
