@@ -15,17 +15,40 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BookEditorActivity" />
 
         <provider
             android:name=".data.BookProvider"
             android:authorities="com.inextends.myratedlibrary"
             android:exported="false" />
 
-        <activity android:name=".BookDetailsActivity" />
-        <!-- <activity android:name=".MainActivity"></activity> -->
-        <activity android:name=".AuthorEditorActivity" />
-        <activity android:name=".AuthorDetailsActivity"></activity>
+        <activity
+            android:name=".BookEditorActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".BookDetailsActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".AuthorEditorActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".AuthorDetailsActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
     </application>
 
 </manifest>
