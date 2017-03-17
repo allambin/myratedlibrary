@@ -15,15 +15,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FilterQueryProvider;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import com.inextends.myratedlibrary.data.BookContract;
+import com.inextends.myratedlibrary.listeners.SearchListener;
 
 public class BookListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = "BookListFragment";
     private BookCursorAdapter mBookCursorAdapter;
     private static final int LOADER_ID = 1;
+    private SearchView mSearchView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +59,30 @@ public class BookListFragment extends Fragment implements LoaderManager.LoaderCa
             public void onClick(View view) {
                 Intent intent = new Intent(getContext(), BookEditorActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        setUpSearchFeature(view);
+    }
+
+    private void setUpSearchFeature(View view) {
+        mSearchView = (SearchView) view.findViewById(R.id.search);
+        mSearchView.setOnQueryTextListener(new SearchListener(mBookCursorAdapter));
+
+        mBookCursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence charSequence) {
+                String select = "(" + BookContract.BookEntry.COLUMN_TITLE + " LIKE ?) ";
+                String[] selectArgs = {"%" + charSequence + "%"};
+                String[] contactsProjection = new String[]{
+                        BookContract.BookEntry._ID,
+                        BookContract.BookEntry.COLUMN_TITLE,
+                        BookContract.BookEntry.COLUMN_COMMENT,
+                        BookContract.BookEntry.COLUMN_RATING,
+                        BookContract.BookEntry.COLUMN_AUTHORS
+                };
+
+                return getActivity().getContentResolver().query(BookContract.BookEntry.CONTENT_URI, contactsProjection, select, selectArgs, null);
             }
         });
     }

@@ -15,15 +15,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FilterQueryProvider;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import com.inextends.myratedlibrary.data.AuthorContract;
+import com.inextends.myratedlibrary.listeners.SearchListener;
 
 public class AuthorListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = "AuthorListFragment";
     private AuthorCursorAdapter mAuthorCursorAdapter;
     private static final int LOADER_ID = 2;
+    private SearchView mSearchView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +59,27 @@ public class AuthorListFragment extends Fragment implements LoaderManager.Loader
             public void onClick(View view) {
                 Intent intent = new Intent(getContext(), AuthorEditorActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        setUpSearchFeature(view);
+    }
+
+    private void setUpSearchFeature(View view) {
+        mSearchView = (SearchView) view.findViewById(R.id.search);
+        mSearchView.setOnQueryTextListener(new SearchListener(mAuthorCursorAdapter));
+
+        mAuthorCursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence charSequence) {
+                String select = "(" + AuthorContract.AuthorEntry.COLUMN_NAME + " LIKE ?) ";
+                String[] selectArgs = {"%" + charSequence + "%"};
+                String[] contactsProjection = new String[]{
+                        AuthorContract.AuthorEntry._ID,
+                        AuthorContract.AuthorEntry.COLUMN_NAME
+                };
+
+                return getActivity().getContentResolver().query(AuthorContract.AuthorEntry.CONTENT_URI, contactsProjection, select, selectArgs, null);
             }
         });
     }
