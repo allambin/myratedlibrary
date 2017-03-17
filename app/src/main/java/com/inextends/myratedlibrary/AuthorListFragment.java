@@ -92,11 +92,10 @@ public class AuthorListFragment extends Fragment implements LoaderManager.Loader
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        String[] projection = {
-                AuthorContract.AuthorEntry._ID,
-                AuthorContract.AuthorEntry.COLUMN_NAME
-        };
-        return new CursorLoader(getContext(), AuthorContract.AuthorEntry.CONTENT_URI, projection, null, null, "name ASC");
+        Uri.Builder builder = AuthorContract.AuthorEntry.CONTENT_URI.buildUpon();
+        builder.appendPath("ratings");
+        Uri uri = builder.build();
+        return new CursorLoader(getContext(), uri, null, null, null, null);
     }
 
     @Override

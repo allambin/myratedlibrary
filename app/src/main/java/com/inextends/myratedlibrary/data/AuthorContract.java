@@ -18,6 +18,8 @@ public class AuthorContract {
 
         public static final String TABLE_NAME = "authors";
         public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_RATING = "rating"; // virtual
+        public static final String COLUMN_BOOKS_COUNT = "books_count"; // virtual
 
         public static final String CONTENT_LIST_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_AUTHORS;

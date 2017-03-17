@@ -10,6 +10,10 @@
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="search">Search</string>
+    <plurals name="books_count">
+        <item quantity="one">%1$d book</item>
+        <item quantity="other">%1$d books</item>
+    </plurals>
     <string name="insert_book_failure">Could not insert book</string>
     <string name="insert_book_success">The book has been saved</string>
     <string name="update_book_failure">Could not update book</string>

@@ -19,6 +19,7 @@ public class BookProvider extends ContentProvider {
     private static final int BOOKS_FROM_AUTHOR = 104;
     private static final int AUTHORS = 102;
     private static final int AUTHORS_ID = 103;
+    private static final int AUTHORS_WITH_RATINGS = 105;
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -27,6 +28,7 @@ public class BookProvider extends ContentProvider {
         sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS + "/#", BOOKS_ID);
         sUriMatcher.addURI(BookContract.CONTENT_AUTHORITY, BookContract.PATH_BOOKS + "/authorid/#", BOOKS_FROM_AUTHOR);
         sUriMatcher.addURI(AuthorContract.CONTENT_AUTHORITY, AuthorContract.PATH_AUTHORS, AUTHORS);
+        sUriMatcher.addURI(AuthorContract.CONTENT_AUTHORITY, AuthorContract.PATH_AUTHORS + "/ratings", AUTHORS_WITH_RATINGS);
         sUriMatcher.addURI(AuthorContract.CONTENT_AUTHORITY, AuthorContract.PATH_AUTHORS + "/#", AUTHORS_ID);
     }
 
@@ -65,6 +67,9 @@ public class BookProvider extends ContentProvider {
                 selection = AuthorContract.AuthorEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 cursor = database.query(AuthorContract.AuthorEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case AUTHORS_WITH_RATINGS:
+                cursor = AuthorRepository.fetchAllWithRatings(database);
                 break;
             default:
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);

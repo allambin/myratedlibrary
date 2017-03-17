@@ -3,6 +3,7 @@ package com.inextends.myratedlibrary.data;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
@@ -42,5 +43,19 @@ class AuthorRepository {
         }
 
         return numRowsAffected;
+    }
+
+    static Cursor fetchAllWithRatings(SQLiteDatabase database) {
+        String sql = "SELECT a." + AuthorContract.AuthorEntry._ID + ", " +
+                AuthorContract.AuthorEntry.COLUMN_NAME + ", " +
+                "avg(b." + BookContract.BookEntry.COLUMN_RATING + ") as " + AuthorContract.AuthorEntry.COLUMN_RATING + ", " +
+                "count(b." + BookContract.BookEntry._ID + ") as " + AuthorContract.AuthorEntry.COLUMN_BOOKS_COUNT + " " +
+                "FROM " + AuthorContract.AuthorEntry.TABLE_NAME + " as a " +
+                "INNER JOIN " + BookAuthorContract.BookAuthorEntry.TABLE_NAME + " as ba " +
+                "ON ba." + BookAuthorContract.BookAuthorEntry.COLUMN_AUTHOR_ID + " = a." + AuthorContract.AuthorEntry._ID + " " +
+                "INNER JOIN " + BookContract.BookEntry.TABLE_NAME + " as b " +
+                "ON ba." + BookAuthorContract.BookAuthorEntry.COLUMN_BOOK_ID + " = b." + BookAuthorContract.BookAuthorEntry._ID + " " +
+                "GROUP BY a." + AuthorContract.AuthorEntry._ID;
+        return database.rawQuery(sql, new String[]{});
     }
 }
